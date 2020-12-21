@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "covmat_mkl.h"
+
 //masquer les PRINTF en mode release
 //addcsv donne une sortie formatee pour les csv
 #ifndef RELEASE
@@ -15,9 +17,6 @@
 #define PRINTF
 #define ADDCSV printf
 #endif
-
-// extern void benchCovMatEstimation_MKL_dp();
-extern void benchCovMatEstimation_MKL_sp();
 
 #ifdef CL
 extern void benchCovMatEstimation_OPENCL_sp();
@@ -40,10 +39,18 @@ int main(int argc, char **argv) {
 	//AutoBenchEstimation_MKL_dp();
 	//PRINTF("\n\n");
 
-	PRINTF("Starting MKL Simple Precision...\n\n");
+	PRINTF("Starting benchmarks...\n\n");
 	//ADDCSV("CovMatEstimation;MKL_SP;FO;%d;",type_fo);
-	AutoBenchEstimation_MKL_sp(nbRUN);
-	PRINTF("\n\n");
+
+	benchmark_results r = covmat_mkl_benchmark_sp(nbRUN);
+
+	printf("*************\t%s Simple Precision\t*************\n", r.name);
+	printf("Average elapsed time\t= %lf ms\n", r.avg_time * 1000);
+	printf("Min time \t= %lf ms\n", r.min_time*1000);
+	printf("Max time \t= %lf ms\n", r.max_time*1000);
+	printf("Nb operation\t= %g Gflop\n", r.gflop);
+	printf("Performance\t= %g Gflop/s\n", r.gflops);
+	printf("\n\n");
 
 #ifdef CUDA
 	PRINTF("Starting CUDA Double Precision...\n\n");
